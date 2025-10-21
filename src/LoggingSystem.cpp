@@ -1,4 +1,4 @@
-#include "./src/main/deploy/web-ds-logger/src/LoggingSystem.h"
+#include "web-ds-logger/src/LoggingSystem.h"
 
 #include <networktables/NetworkTableInstance.h>
 #include <frc/RobotController.h>
