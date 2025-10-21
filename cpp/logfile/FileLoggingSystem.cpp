@@ -1,6 +1,5 @@
-#include "web-ds-logger/logfile/LoggingSystem.h"
+#include "web-ds-logger/cpp/logfile/FileLoggingSystem.h"
 
-#include "Constants.h"
 #include <fstream>
 #include <cstdio>
 #include <mutex>

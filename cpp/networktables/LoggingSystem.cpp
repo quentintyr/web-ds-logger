@@ -1,4 +1,4 @@
-#include "web-ds-logger/networktables/LoggingSystem.h"
+#include "web-ds-logger/cpp/networktables/LoggingSystem.h"
 
 #include <networktables/NetworkTableInstance.h>
 #include <frc/RobotController.h>
