@@ -1,4 +1,8 @@
 #include "web-ds-logger/cpp/networktables/LoggingSystem.h"
+#include "subsystems/sensor/IRRangeSubsystem.h"
+#include "subsystems/sensor/UltrasonicSubsystem.h"
+#include "subsystems/sensor/SensorManager.h"
+#include "RobotContainer.h"
 
 #include <networktables/NetworkTableInstance.h>
 #include <frc/RobotController.h>
@@ -8,6 +12,7 @@
 #include <mutex>
 #include <sstream>
 #include <vector>
+#include <cmath>
 
 ModeInfo last_mode = {LOG_GREEN, "[INIT]"};
 std::mutex log_mutex;
@@ -17,6 +22,11 @@ static std::shared_ptr<nt::NetworkTable> logsTable;
 static int logEntryCounter = 0;
 static std::vector<std::string> logHistory;
 static const int MAX_LOG_HISTORY = 500; // Keep last 500 log entries
+
+inline double roundTo2Decimals(double value)
+{
+    return std::round(value * 100.0) / 100.0;
+}
 
 void SetupLogging()
 {
@@ -100,28 +110,44 @@ void SetupLogging()
     std::cout.rdbuf(ntBuffer);
     std::cerr.rdbuf(ntBuffer);
 
-    LOG_INFO("Finished Setup Logging (NetworkTables Only)");
+    LOG_INFO("Finished Setup Logging");
 }
 
-void UpdateLogging()
+void UpdateLogging(SensorManager *sensorManager)
 {
     // check battery voltage
-    auto table = nt::NetworkTableInstance::GetDefault().GetTable("Dashboard");
+    auto dashboard = nt::NetworkTableInstance::GetDefault().GetTable("Dashboard");
     double batteryVoltage = frc::RobotController::GetInputVoltage();
-    table->PutNumber("Battery", batteryVoltage);
+    dashboard->PutNumber("Battery", batteryVoltage);
+
+    if (sensorManager && sensorManager->GetIRRangeSubsystem())
+    {
+        auto ultraSonic = sensorManager->GetUltrasonicSubsystem();
+        dashboard->PutNumber("USSensorLeft", roundTo2Decimals(ultraSonic->GetLeftDistance()));
+        dashboard->PutNumber("USSensorRight", roundTo2Decimals(ultraSonic->GetRightDistance()));
+    }
+
+    if (sensorManager && sensorManager->GetIRRangeSubsystem())
+    {
+        auto irSensor = sensorManager->GetIRRangeSubsystem();
+        dashboard->PutNumber("IRSensorLeft", roundTo2Decimals(irSensor->GetIRLeftDistance()));
+        dashboard->PutNumber("IRSensorRight", roundTo2Decimals(irSensor->GetIRRightDistance()));
+    }
+
+    if (sensorManager && sensorManager->GetLidarSubsystem())
+    {
+        auto lidarSensor = sensorManager->GetLidarSubsystem();
+        dashboard->PutNumber("lidarDistance", roundTo2Decimals(lidarSensor->GetDistanceAtAngle(0)));
+    }
+
     // robot mode
     auto mode = GetRobotMode();
-    table->PutString("RobotMode", mode);
-
-    // get can status
-    // bool GetCANStatus
+    dashboard->PutString("RobotMode", mode);
 }
 
-void InitLogging()
+void InitLogging(SensorManager *sensorManager)
 {
     // Initialize NetworkTables connections
-    auto inst = nt::NetworkTableInstance::GetDefault().GetTable("Logs");
-    inst->PutString("Log", "test");
     auto table = nt::NetworkTableInstance::GetDefault().GetTable("Dashboard");
     table->PutString("RobotMode", "init");
     table->PutBoolean("Connected", true);
@@ -137,8 +163,6 @@ void InitLogging()
     logHistory.push_back(initMsg);
     logsTable->PutString("latest", initMsg);
     logsTable->PutString("history", initMsg + "\n");
-
-    LOG_INFO("Initializing Robot...");
 }
 
 std::string GetRobotMode()

@@ -8,6 +8,8 @@
 #include <iomanip>
 #include <mutex>
 
+#include "subsystems/sensor/SensorManager.h"
+
 // ascii colors
 // #define LOG_RESET   "\033[0m"
 // #define LOG_RED     "\033[31m"
@@ -48,8 +50,8 @@ extern ModeInfo last_mode;
 extern std::mutex log_mutex;
 
 void SetupLogging();
-void UpdateLogging();
-void InitLogging();
+void UpdateLogging(SensorManager* sensorManager = nullptr);
+void InitLogging(SensorManager* sensorManager = nullptr);
 std::string GetRobotMode();
 
 inline std::string current_time()
