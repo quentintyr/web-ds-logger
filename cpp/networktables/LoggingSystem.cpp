@@ -84,9 +84,8 @@ void SetupLogging()
                         }
                         logsTable->PutString("history", historyStream.str());
 
-                        // Also store with unique entry number for debugging
-                        std::string entryKey = "entry_" + std::to_string(logEntryCounter++);
-                        logsTable->PutString(entryKey, line);
+                        // std::string entryKey = "entry_" + std::to_string(logEntryCounter++);
+                        // logsTable->PutString(entryKey, line);
 
                         // Keep a timestamp
                         logsTable->PutNumber("timestamp", std::time(nullptr));
