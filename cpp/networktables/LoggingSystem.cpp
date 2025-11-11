@@ -120,7 +120,7 @@ void UpdateLogging(SensorManager *sensorManager)
     double batteryVoltage = frc::RobotController::GetInputVoltage();
     dashboard->PutNumber("Battery", batteryVoltage);
 
-    if (sensorManager && sensorManager->GetIRRangeSubsystem())
+    if (sensorManager && sensorManager->GetUltrasonicSubsystem())
     {
         auto ultraSonic = sensorManager->GetUltrasonicSubsystem();
         dashboard->PutNumber("USSensorLeft", roundTo2Decimals(ultraSonic->GetLeftDistance()));
@@ -134,10 +134,14 @@ void UpdateLogging(SensorManager *sensorManager)
         dashboard->PutNumber("IRSensorRight", roundTo2Decimals(irSensor->GetIRRightDistance()));
     }
 
-    if (sensorManager && sensorManager->GetLidarSubsystem())
+    // LiDAR sensor data (if available)
+    if (sensorManager)
     {
         auto lidarSensor = sensorManager->GetLidarSubsystem();
-        dashboard->PutNumber("lidarDistance", roundTo2Decimals(lidarSensor->GetDistanceAtAngle(0)));
+        if (lidarSensor)
+        {
+            dashboard->PutNumber("lidarDistance", roundTo2Decimals(lidarSensor->GetDistanceAtAngle(0)));
+        }
     }
 
     // robot mode

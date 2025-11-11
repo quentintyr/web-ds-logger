@@ -26,19 +26,19 @@
 // #define UNDERLINE   "\033[4m"
 
 // html colors
-#define LOG_RESET   "</span>"
-#define LOG_RED     "<span style=\"color:#FF0000\">"
-#define LOG_YELLOW  "<span style=\"color:#FFFF00\">"
-#define LOG_GREEN   "<span style=\"color:#008000\">"
-#define LOG_CYAN    "<span style=\"color:#00FFFF\">"
-#define LOG_BLUE    "<span style=\"color:#0000FF\">"
-#define LOG_PURPLE  "<span style=\"color:#800080\">"
-#define LOG_WHITE   "<span style=\"color:#FFFFFF\">"
+#define LOG_RESET "</span>"
+#define LOG_RED "<span style=\"color:#FF0000\">"
+#define LOG_YELLOW "<span style=\"color:#FFFF00\">"
+#define LOG_GREEN "<span style=\"color:#008000\">"
+#define LOG_CYAN "<span style=\"color:#00FFFF\">"
+#define LOG_BLUE "<span style=\"color:#0000FF\">"
+#define LOG_PURPLE "<span style=\"color:#800080\">"
+#define LOG_WHITE "<span style=\"color:#FFFFFF\">"
 
-#define BOLD        ""
-#define bold_res    ""
-#define ITALICS     ""
-#define UNDERLINE   ""
+#define BOLD ""
+#define bold_res ""
+#define ITALICS ""
+#define UNDERLINE ""
 
 struct ModeInfo
 {
@@ -50,8 +50,8 @@ extern ModeInfo last_mode;
 extern std::mutex log_mutex;
 
 void SetupLogging();
-void UpdateLogging(SensorManager* sensorManager = nullptr);
-void InitLogging(SensorManager* sensorManager = nullptr);
+void UpdateLogging(SensorManager *sensorManager = nullptr);
+void InitLogging(SensorManager *sensorManager = nullptr);
 std::string GetRobotMode();
 
 inline std::string current_time()
@@ -72,45 +72,45 @@ inline std::string current_time()
 // default log infos
 #define LOG_INFO(value)                                                                                                  \
     {                                                                                                                    \
-        std::lock_guard<std::mutex> lock(log_mutex); \
+        std::lock_guard<std::mutex> lock(log_mutex);                                                                     \
         std::cout << "[" << current_time() << "] " << BOLD << LOG_GREEN << "[INFO] " << LOG_RESET << value << std::endl; \
     }
 #define LOG_WARN(value)                                                                                           \
     {                                                                                                             \
-        std::lock_guard<std::mutex> lock(log_mutex); \
+        std::lock_guard<std::mutex> lock(log_mutex);                                                              \
         std::cout << "[" << current_time() << "] " << LOG_YELLOW << "[WARN] " << LOG_RESET << value << std::endl; \
     }
 #define LOG_ERROR(value)                                                                                        \
     {                                                                                                           \
-        std::lock_guard<std::mutex> lock(log_mutex); \
+        std::lock_guard<std::mutex> lock(log_mutex);                                                            \
         std::cerr << "[" << current_time() << "] " << LOG_RED << "[ERROR] " << LOG_RESET << value << std::endl; \
     }
 
 // mode log infos
 #define LOG_AUTONOMOUS(value)                                                                                           \
     {                                                                                                                   \
-        std::lock_guard<std::mutex> lock(log_mutex); \
+        std::lock_guard<std::mutex> lock(log_mutex);                                                                    \
         std::cout << "[" << current_time() << "] " << LOG_PURPLE << "[AUTONOMOUS] " << LOG_RESET << value << std::endl; \
     }
 #define LOG_TELEOP(value)                                                                                         \
     {                                                                                                             \
-        std::lock_guard<std::mutex> lock(log_mutex); \
+        std::lock_guard<std::mutex> lock(log_mutex);                                                              \
         std::cout << "[" << current_time() << "] " << LOG_CYAN << "[TELEOP] " << LOG_RESET << value << std::endl; \
     }
 #define LOG_TEST(value)                                                                                           \
     {                                                                                                             \
-        std::lock_guard<std::mutex> lock(log_mutex); \
+        std::lock_guard<std::mutex> lock(log_mutex);                                                              \
         std::cout << "[" << current_time() << "] " << LOG_YELLOW << "[TEST] " << LOG_RESET << value << std::endl; \
     }
 #define LOG_DISABLED(value)                                                                                                 \
     {                                                                                                                       \
-        std::lock_guard<std::mutex> lock(log_mutex); \
+        std::lock_guard<std::mutex> lock(log_mutex);                                                                        \
         std::cout << "[" << current_time() << "] " << last_mode.color << last_mode.name << LOG_RESET << value << std::endl; \
     }
 
 // thread infos
 #define LOG_THREAD(value)                                                                                                \
     {                                                                                                                    \
-        std::lock_guard<std::mutex> lock(log_mutex); \
+        std::lock_guard<std::mutex> lock(log_mutex);                                                                     \
         std::cout << "[" << current_time() << "] " << LOG_RED << BOLD << "[THREAD] " << LOG_RESET << value << std::endl; \
     }
