@@ -100,7 +100,7 @@ void SetupLogging()
 
         virtual int sync() override
         {
-            return 0; // No file sync needed
+            return 0; 
         }
     };
 
@@ -119,27 +119,16 @@ void UpdateLogging(SensorManager *sensorManager)
     double batteryVoltage = frc::RobotController::GetInputVoltage();
     dashboard->PutNumber("Battery", batteryVoltage);
 
-    if (sensorManager && !SensorManager::EnableSensorThread.load())
+    if (sensorManager)
     {
-        // Sensor thread is NOT running - safe to access sensors
-        if (auto ultraSonic = sensorManager->GetUltrasonicSubsystem())
-        {
-            dashboard->PutNumber("USSensorLeft", roundTo2Decimals(ultraSonic->GetLeftDistance()));
-            dashboard->PutNumber("USSensorRight", roundTo2Decimals(ultraSonic->GetRightDistance()));
-        }
-
-        if (auto irSensor = sensorManager->GetIRRangeSubsystem())
-        {
-            dashboard->PutNumber("IRSensorLeft", roundTo2Decimals(irSensor->GetIRLeftDistance()));
-            dashboard->PutNumber("IRSensorRight", roundTo2Decimals(irSensor->GetIRRightDistance()));
-        }
-
-        if (auto lidarSensor = sensorManager->GetLidarSubsystem())
-        {
-            dashboard->PutNumber("lidarDistance", roundTo2Decimals(lidarSensor->GetDistanceAtAngle(0)));
-        }
+        // read values from cache
+        auto cache = sensorManager->GetSensorCache();
+        dashboard->PutNumber("USSensorLeft", roundTo2Decimals(cache->ultrasonicLeft.load(std::memory_order_relaxed)));
+        dashboard->PutNumber("USSensorRight", roundTo2Decimals(cache->ultrasonicRight.load(std::memory_order_relaxed)));
+        dashboard->PutNumber("IRSensorLeft", roundTo2Decimals(cache->irLeft.load(std::memory_order_relaxed)));
+        dashboard->PutNumber("IRSensorRight", roundTo2Decimals(cache->irRight.load(std::memory_order_relaxed)));
+        dashboard->PutNumber("lidarDistance", roundTo2Decimals(cache->lidarFront.load(std::memory_order_relaxed)));
     }
-    // else: sensor thread is running, skip sensor dashboard updates to avoid mutex contention
 
     // robot mode
     auto mode = GetRobotMode();
