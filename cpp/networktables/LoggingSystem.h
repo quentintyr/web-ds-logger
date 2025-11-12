@@ -51,7 +51,7 @@ extern std::mutex log_mutex;
 
 void SetupLogging();
 void UpdateLogging(SensorManager *sensorManager = nullptr);
-void InitLogging(SensorManager *sensorManager = nullptr);
+void InitLogging();
 std::string GetRobotMode();
 
 inline std::string current_time()

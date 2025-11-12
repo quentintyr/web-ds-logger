@@ -119,36 +119,34 @@ void UpdateLogging(SensorManager *sensorManager)
     double batteryVoltage = frc::RobotController::GetInputVoltage();
     dashboard->PutNumber("Battery", batteryVoltage);
 
-    if (sensorManager && sensorManager->GetUltrasonicSubsystem())
+    if (sensorManager && !SensorManager::EnableSensorThread.load())
     {
-        auto ultraSonic = sensorManager->GetUltrasonicSubsystem();
-        dashboard->PutNumber("USSensorLeft", roundTo2Decimals(ultraSonic->GetLeftDistance()));
-        dashboard->PutNumber("USSensorRight", roundTo2Decimals(ultraSonic->GetRightDistance()));
-    }
+        // Sensor thread is NOT running - safe to access sensors
+        if (auto ultraSonic = sensorManager->GetUltrasonicSubsystem())
+        {
+            dashboard->PutNumber("USSensorLeft", roundTo2Decimals(ultraSonic->GetLeftDistance()));
+            dashboard->PutNumber("USSensorRight", roundTo2Decimals(ultraSonic->GetRightDistance()));
+        }
 
-    if (sensorManager && sensorManager->GetIRRangeSubsystem())
-    {
-        auto irSensor = sensorManager->GetIRRangeSubsystem();
-        dashboard->PutNumber("IRSensorLeft", roundTo2Decimals(irSensor->GetIRLeftDistance()));
-        dashboard->PutNumber("IRSensorRight", roundTo2Decimals(irSensor->GetIRRightDistance()));
-    }
+        if (auto irSensor = sensorManager->GetIRRangeSubsystem())
+        {
+            dashboard->PutNumber("IRSensorLeft", roundTo2Decimals(irSensor->GetIRLeftDistance()));
+            dashboard->PutNumber("IRSensorRight", roundTo2Decimals(irSensor->GetIRRightDistance()));
+        }
 
-    // LiDAR sensor data (if available)
-    if (sensorManager)
-    {
-        auto lidarSensor = sensorManager->GetLidarSubsystem();
-        if (lidarSensor)
+        if (auto lidarSensor = sensorManager->GetLidarSubsystem())
         {
             dashboard->PutNumber("lidarDistance", roundTo2Decimals(lidarSensor->GetDistanceAtAngle(0)));
         }
     }
+    // else: sensor thread is running, skip sensor dashboard updates to avoid mutex contention
 
     // robot mode
     auto mode = GetRobotMode();
     dashboard->PutString("RobotMode", mode);
 }
 
-void InitLogging(SensorManager *sensorManager)
+void InitLogging()
 {
     // Initialize NetworkTables connections
     auto table = nt::NetworkTableInstance::GetDefault().GetTable("Dashboard");
