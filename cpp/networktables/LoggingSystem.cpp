@@ -127,7 +127,6 @@ void UpdateLogging(SensorManager *sensorManager)
         dashboard->PutNumber("USSensorRight", roundTo2Decimals(cache->ultrasonicRight.load(std::memory_order_relaxed)));
         dashboard->PutNumber("IRSensorLeft", roundTo2Decimals(cache->irLeft.load(std::memory_order_relaxed)));
         dashboard->PutNumber("IRSensorRight", roundTo2Decimals(cache->irRight.load(std::memory_order_relaxed)));
-        dashboard->PutNumber("lidarDistance", roundTo2Decimals(cache->lidarFront.load(std::memory_order_relaxed)));
     }
 
     // robot mode
